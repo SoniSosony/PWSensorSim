@@ -1,0 +1,11 @@
+<div>
+    <a class="navbar-brand" (click)="showNavBar()">
+        <img src="/assets/icons/reorder-black-48dp.svg" class="nav-bar-button" alt="">
+    </a>
+    <h1 class="title">    Sensor pHmetryczny</h1>
+    <br>
+    <hr>
+    <div class="sim-list" #transform>
+        <app-simulation-list (refClicked)="showNavBar()"></app-simulation-list>
+    </div>
+</div>

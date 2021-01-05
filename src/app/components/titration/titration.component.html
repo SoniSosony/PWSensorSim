@@ -1,0 +1,52 @@
+<h1>Miareczkowanie</h1>
+
+<div class="content">
+    <mat-grid-list cols="10" rowHeight="10%">
+
+        <mat-grid-tile rowspan='10' colspan='1' style="background: #f0f0f0;">
+            <div class="titration-container">
+    
+                <mat-grid-list cols="1" rowHeight="5%">
+                    <mat-grid-tile rowspan='13' colspan='1' style="background: #ffffff;">
+                        <div class='biureta-container'>
+                            <div class='biureta-stack'>
+                                <img src="../../../assets/icons/biureta_full.svg" class="biureta-full">
+                                <div class='white-container' #whiteContainer></div>
+                                <img src="../../../assets/icons/biureta_empty.svg" class="biureta-empty">
+                            </div>
+                        </div>
+                    </mat-grid-tile>
+            
+                    <mat-grid-tile rowspan='6' colspan='1' style="background: #ffffff;">
+                        <div class='beaker-with-water-drop-container'>
+                            <div class="water-drop-container" #waterDropContainer>
+                                <img src="../../../assets/icons/water_drop.svg" class="water_drop">
+                            </div>
+                            <div class='beaker-container'>
+                                <img src="../../../assets/icons/beaker_with_phMetr_red.svg" class="beaker_with_phMetr" #beaker>
+                            </div>
+                        </div>
+                    </mat-grid-tile>
+                </mat-grid-list>
+            
+            </div>
+        </mat-grid-tile>
+
+        <mat-grid-tile rowspan='6' colspan='6' style="background: #f0f0f0;">
+            <div class="border chart-container">
+                <app-titration-chart class='chart'></app-titration-chart>
+            </div>
+        </mat-grid-tile>
+
+        <mat-grid-tile rowspan='1' colspan='3' style="background: #f0f0f0;">
+        </mat-grid-tile>
+
+        <mat-grid-tile rowspan='1' colspan='1' style="background: #f0f0f0;">
+            <div class='sim-buttons'>
+                <button class="start-btn" (click)="startTitration()">Start</button>
+                <button class="restart-btn" (click)="restartPage()">Restart</button>
+            </div>
+        </mat-grid-tile>
+    
+    </mat-grid-list>
+</div>

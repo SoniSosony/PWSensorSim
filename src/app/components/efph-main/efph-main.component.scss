@@ -1,0 +1,118 @@
+:host {
+    display: block;
+}
+
+.sim-window {
+    position: absolute;
+    height: 60%;
+    width: 40%;
+    box-shadow: 0px 0px 13px 1px #cacaca;
+}
+
+.beaker-empty {
+    display: block;
+    height: 90%;
+    margin: auto;
+}
+
+.beaker-for-test-container {
+    height: 100%;
+    width: 20%;
+}
+
+.phMetr-beaker-for-test {
+    display: block;
+    margin-top: 30%;
+    margin-right: 2%;
+    height: 60%;
+    width:  98%;
+    opacity: 0;
+}
+
+.beaker-for-test {
+    display: block;
+    margin-top: -90%;
+    width: 100%;
+    opacity: 0.86;
+}
+
+.clear-beaker-for-test-btn {
+    display: block;
+    margin-top: 2%;
+    width: 100%;
+}
+
+.barrel-full {
+    height: 250px;
+    width: 250px;
+    margin-left: 6px;
+}
+
+.sim-tools {
+    position: absolute;
+    margin-left: 41%;
+    height: 60%;
+    box-shadow: 0px 0px 13px 1px #cacaca;
+}
+
+.draggable {
+    user-select: none;
+    -moz-user-select: none;
+    -webkit-user-drag: none;
+    -webkit-user-select: none;
+    -ms-user-select: none;
+    pointer-events: none;
+}
+
+.main-sim-window {
+    height: 60%;
+    width: 60%;
+}
+
+.tool {
+    height: 100%;
+    width: auto;
+}
+
+.tool-container {
+    display: inline-block;
+    height: 26%;
+}
+
+.beakers-container {
+    display: block;
+    height: 100%;
+    width: 100%;
+}
+
+.beaker-with-text-container {
+    height: 14%;
+    width: 100%;
+}
+
+.interface-container {
+    position: absolute;
+}
+
+.chart-container {
+    width: 90%;
+    height: 90%;
+    border: 1px solid #ccc !important;
+    border-radius: 8px;
+}
+
+.chart {
+    position: relative;
+    display: inline-block;
+    margin-top: 2%;
+    margin-top: 2%;
+    width: 98%;
+    height: 90%;
+}
+
+.img-text {
+    margin-top: -20%; 
+    width: 100%;
+    text-align: center;
+    font-size: 16px;
+}

@@ -1,0 +1,77 @@
+<h1>Wyznaczenie charakterystyki Eout=f(pH) dla roztworów buforowych</h1>
+<div id="mainSimWindow" #mainSimWindow>
+    <div id="mainDragWindow" class="main-sim-window" #mainDragWindow>
+        <div class="sim-window">
+
+            <mat-grid-list cols="4" rowHeight="25%">
+                <mat-grid-tile rowspan='4' colspan='1' style="background: #ffffff;">
+                    <div class="beakers-container" #beakersContainer>
+                        <div class='beaker-with-text-container'>
+                            <img id="beaker_1" src="../../../assets/icons/beaker_full.svg" (click)="beakerClicked($event)" class="beaker-empty">
+                            <div class="img-text">2.21pH</div>
+                        </div>
+                        <div class='beaker-with-text-container'>
+                            <img id="beaker_2" src="../../../assets/icons/beaker_full.svg" (click)="beakerClicked($event)" class="beaker-empty">
+                            <div class="img-text">3.29pH</div>
+                        </div>
+                        <div class='beaker-with-text-container'>
+                            <img id="beaker_3" src="../../../assets/icons/beaker_full.svg" (click)="beakerClicked($event)" class="beaker-empty">
+                            <div class="img-text">4.56pH</div>
+                        </div>
+                        <div class='beaker-with-text-container'>
+                            <img id="beaker_4" src="../../../assets/icons/beaker_full.svg" (click)="beakerClicked($event)" class="beaker-empty">
+                            <div class="img-text">5.72pH</div>
+                        </div>
+                        <div class='beaker-with-text-container'>
+                            <img id="beaker_5" src="../../../assets/icons/beaker_full.svg" (click)="beakerClicked($event)" class="beaker-empty">
+                            <div class="img-text">7.96pH</div>
+                        </div>
+                        <div class='beaker-with-text-container'>
+                            <img id="beaker_6" src="../../../assets/icons/beaker_full.svg" (click)="beakerClicked($event)" class="beaker-empty">
+                            <div class="img-text">9.15pH</div>
+                        </div>
+                        <div class='beaker-with-text-container'>
+                            <img id="beaker_7" src="../../../assets/icons/beaker_full.svg" (click)="beakerClicked($event)" class="beaker-empty">
+                            <div class="img-text">10.38pH</div>
+                        </div>
+                    </div>
+                </mat-grid-tile>
+
+                <mat-grid-tile rowspan='2' colspan='3' style="background: #ffffff;">
+                    <div class="border chart-container">
+                        <app-line-chart class='chart'></app-line-chart>
+                    </div>
+                </mat-grid-tile>
+
+                <mat-grid-tile rowspan='2' colspan='3' style="background: #ffffff;">
+                    <div class="beaker-for-test-container" (click)="beakerForTestContainerClicked($event)" #beakerForTestContainer>
+                        <img src="../../../assets/icons/phMetr.svg" class="phMetr-beaker-for-test">
+                        <img src="../../../assets/icons/beaker_empty.svg" class="beaker-for-test" #beakerForTest>
+                        <button class="clear-beaker-for-test-btn" (click)="toEmptyBeakerForTest()">To empty</button>
+                    </div>
+                </mat-grid-tile>
+
+              </mat-grid-list>
+
+        </div>     
+        <div class="sim-tools" #simToolDiv>
+        </div>
+        <div id="interface_container" class="interface-container" #interfaceContainer>
+            <input value={{phValue}}>
+            <div #temperatureChooserContainer>
+                <input type="radio" id="male" name="temperature" value="0" (change)="temperatureChooseEvt($event)">
+                <label for="male">0°C</label><br>
+                <input type="radio" id="female" name="temperature" value="25" (change)="temperatureChooseEvt($event)">
+                <label for="female">25°C</label><br>
+                <input type="radio" id="other" name="temperature" value="100" (change)="temperatureChooseEvt($event)">
+                <label for="other">100°C</label> 
+            </div>
+        </div>
+        <div id="pippette_div" (mousedown)="mouseDown($event)" class="tool-container" style="position: absolute;" #pipperreDiv>
+            <img id="pippette" src="../../../assets/icons/pipette_empty.svg" class="tool draggable">
+        </div>
+        <div id="phMetr_div" (mousedown)="mouseDown($event)" class="tool-container" style="position: absolute;" #phMetrDiv>
+            <img id="phMetr" src="../../../assets/icons/phMetr.svg" class="tool draggable" style="opacity: 100;">   
+        </div>
+    </div>
+</div>
