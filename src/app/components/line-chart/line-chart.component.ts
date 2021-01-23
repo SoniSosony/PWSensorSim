@@ -1,6 +1,7 @@
 import { Component, OnInit, NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { NgxChartsModule } from '@swimlane/ngx-charts';
+import { phMeter } from '../../classes/phMeter';
 import { InteractionService } from '../../services/interaction.service';
 
 @Component({
@@ -9,7 +10,6 @@ import { InteractionService } from '../../services/interaction.service';
   styleUrls: ['./line-chart.component.scss']
 })
 export class LineChartComponent implements OnInit {
-
   data: any[];
   view: any[] = [700, 300];
 
@@ -22,8 +22,7 @@ export class LineChartComponent implements OnInit {
   showXAxisLabel: boolean = true;
   xAxisLabel: string = 'pH';
   yAxisLabel: string = 'Voltage [mV]';
-  xScaleMin: any = 0
-  xScaleMax: any = 14;
+
 
   colorScheme = {
     domain: ['#5AA454', '#E44D25', '#CFC0BB', '#7aa3e5', '#a8385d', '#aae3f5']
@@ -54,15 +53,12 @@ export class LineChartComponent implements OnInit {
   }
 
   onSelect(data: any): void {
-    console.log('Item clicked', JSON.parse(JSON.stringify(data)));
   }
 
   onActivate(data: any): void {
-    console.log('Activate', JSON.parse(JSON.stringify(data)));
   }
 
   onDeactivate(data: any): void {
-    console.log('Deactivate', JSON.parse(JSON.stringify(data)));
   }
 
   updateChart(){

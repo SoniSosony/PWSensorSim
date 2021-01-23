@@ -25,6 +25,10 @@ export class phMeter {
         return this.T;
     }
 
+    public getTemperatureInCelsius(): number {
+        return this.T - 273.15;
+    }
+
     public getVoltage(pHx: number): number {
         return ( this.R * this.T * Math.LN10 * (this.pHs - pHx) + this.Es.get(this.T) * this.F ) / this.F;
     }

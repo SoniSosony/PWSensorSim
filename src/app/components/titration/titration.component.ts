@@ -4,6 +4,10 @@ import { PhKOHH2SO4 } from '../../classes/phCalculator';
 import { Liquid } from '../../classes/phCalculator';
 import { InteractionService } from '../../services/interaction.service';
 import { RouteService } from '../../services/route-service/route.service';
+import { pHV } from '../../classes/interfaces/basic';
+import { phMeter, Temperature } from '../../classes/phMeter';
+import { VoltageMeasurement } from '../../classes/interfaces/basic';
+import { LineChartComponent } from '../line-chart/line-chart.component';
 
 @Component({
   selector: 'app-titration',
@@ -12,9 +16,15 @@ import { RouteService } from '../../services/route-service/route.service';
 })
 export class TitrationComponent implements OnInit, AfterViewInit {
 
+  @ViewChild('title') titleRef: ElementRef;
+
   @ViewChild('whiteContainer') whiteContainerRef: ElementRef;
   @ViewChild('waterDropContainer') waterDropContainerRef: ElementRef;
   @ViewChild('beaker') beakerRef: ElementRef;
+  @ViewChild('table') tableRef: ElementRef;
+
+  @ViewChild('userValue') userValueRef: ElementRef;
+  @ViewChild('checkStatusSpan') checkStatusSpanRef: ElementRef;
 
   private waterInterval: any;
   private waterDropInterval: any;
@@ -23,16 +33,24 @@ export class TitrationComponent implements OnInit, AfterViewInit {
   private alkali: Liquid;
   private data: any[];
   private simMode: string;
+  private phMeter = new phMeter();
+  private answer: number;
+  showEquations: boolean = false;
+  showInstruction: boolean = false;
+  currentItem = 'Television';
+
+  displayedColumns: string[] = ["V", "voltage"];
+  dataSource: VoltageMeasurement[] = [];
 
   constructor(
-      private shareService: InteractionService, 
+      private shareService: InteractionService,
       private routeService: RouteService
     ) {
     this.initAcidAlkaliTitration();
 
     this.data = [
       {
-        'name': 'pH',
+        'name': 'Voltage',
         'series': []
       }
     ];
@@ -40,6 +58,8 @@ export class TitrationComponent implements OnInit, AfterViewInit {
     this.routeService.newPageName.subscribe((pageName: string) => {
       this.setSimulationMode(pageName);
     });
+
+    this.phMeter.setTemperature(Temperature.TWENTYFIVE);
 
    }
 
@@ -55,27 +75,45 @@ export class TitrationComponent implements OnInit, AfterViewInit {
   }
 
   private setSimulationMode(pageName: string): void {
+    this.setTitle(pageName);
+
     if (pageName == 'titrationAcid') {
       this.initAcidAlkaliTitration();
       this.restartPage();
+      this.showInstruction = true;
       this.simMode = 'titrationAcid';
     } else if (pageName == 'titrationAlkali') {
       this.initAlkaliAcidTitration();
       this.restartPage();
+      this.showInstruction = false;
       this.simMode = 'titrationAlkali';
+    }
+  }
+
+  private setTitle(pageName: string): void {
+    if (pageName == 'titrationAcid') {
+      this.titleRef.nativeElement.innerHTML = "Acid - base titration";
+    } else if (pageName == 'titrationAlkali') {
+      this.titleRef.nativeElement.innerHTML = "Base - acid titration";
     }
   }
 
   private initAcidAlkaliTitration() {
     this.phCalculator = new PhHClNaOH();
-    this.acid = new Liquid(0.02, 0.095);
+    this.answer = this.getRandomConcentration(0.095);
+    this.acid = new Liquid(0.02, this.answer);
     this.alkali = new Liquid(0.001, 0.1);
   }
 
   private initAlkaliAcidTitration() {
     this.phCalculator = new PhKOHH2SO4();
-    this.alkali = new Liquid(0.08, 0.04);
+    this.answer = this.getRandomConcentration(0.04);
+    this.alkali = new Liquid(0.08, this.answer);
     this.acid = new Liquid(0.001, 0.1);
+  }
+
+  private getRandomConcentration(concentration: number) {
+    return Math.floor(Math.random() * 10) / 1000 + concentration;
   }
 
   public startTitration(): void {
@@ -116,17 +154,20 @@ export class TitrationComponent implements OnInit, AfterViewInit {
   }
 
   private calcTitration(): void {
+    let pHV: pHV;
     if (this.simMode == 'titrationAcid') {
-      let pH = this.addLiquid(false);
-      if (pH > 7) {
+      pHV = this.addLiquid(false);
+      if (pHV.pH > 7) {
         this.beakerRef.nativeElement.src = '../../../assets/icons/beaker_with_phMetr_yellow.svg';
       }
     } else {
-      let pH = this.addLiquid(true);
-      if (pH < 7) {
+      pHV = this.addLiquid(true);
+      if (pHV.pH < 7) {
         this.beakerRef.nativeElement.src = '../../../assets/icons/beaker_with_phMetr_yellow.svg';
       }
     }
+    this.addDataToChart(pHV);
+    this.addDataToTabel(pHV);
   }
 
   private animateTitrationProcess(): void {
@@ -173,7 +214,7 @@ export class TitrationComponent implements OnInit, AfterViewInit {
     return number;
   }
 
-  private addLiquid(acid: boolean): number {
+  private addLiquid(acid: boolean): pHV {
     let pHV: any;
     if (acid) {
       pHV = this.addAcid();
@@ -181,50 +222,100 @@ export class TitrationComponent implements OnInit, AfterViewInit {
       pHV = this.addAlkali();
     }
 
-    let val = {
-      'name': pHV.V,
-      'value': pHV.pH
-    }
-
-    this.data[0].series.push(val);
-    this.shareService.setTitrationData(this.data);
-
-    return pHV.pH;
+    return pHV;
   }
 
-  private addAcid(): any {
+  private addAcid(): pHV {
     let V_acid = this.acid.getV();
     let V = V_acid + 0.001;
     this.acid.setV(V_acid + 0.001);
     let pH = this.phCalculator.calcPh(this.acid, this.alkali);
 
-    return {
-      pH: pH,
-      V: V
-    }
+    let pHV: pHV = {
+     pH: pH,
+     V: V 
+    };
+
+    return pHV;
   }
 
-  private addAlkali(): any {
+  private addAlkali(): pHV {
     let V_alkali = this.alkali.getV();
     let V = V_alkali + 0.001;
     this.alkali.setV(V);
     let pH = this.phCalculator.calcPh(this.acid, this.alkali);
 
-    return {
+    let pHV: pHV = {
       pH: pH,
-      V: V
-    }
+      V: V 
+     };
+
+     return pHV;
   }
   
   public restartPage(): void {
     this.restartTitration();
     this.data[0].series = [];
     this.shareService.setTitrationData([]);
+    this.clearTable();
+  }
 
-    if (this.simMode == 'titrationAcid') {
-      this.initAcidAlkaliTitration();
-    } else if (this.simMode == 'titrationAlkali') {
-      this.initAlkaliAcidTitration();
+  private addDataToChart(pHV: pHV): void {
+    let voltage = this.phMeter.getVoltage(pHV.pH);
+    let newData = {
+      'name': pHV.V,
+      'value': voltage
+    }
+
+    this.data[0].series.push(newData);
+    this.shareService.setTitrationData(this.data);
+  }
+
+  private addDataToTabel(pHV: pHV): void {
+    let newData: VoltageMeasurement[] = [];
+    
+    for (let i = 0; i < this.dataSource.length; i++) {
+      let val: VoltageMeasurement = {V: 0, voltage: 0};
+      val.V = this.dataSource[i].V;
+      val.voltage = this.dataSource[i].voltage;
+      newData.push(val);
+    }
+
+    let voltage = this.phMeter.getVoltage(pHV.pH);
+    voltage = parseFloat(voltage.toFixed(3));
+    let V = parseFloat(pHV.V.toFixed(3));
+
+    let val = {
+      V: V,
+      voltage: voltage
+    }
+
+    newData.push(val);
+
+    this.dataSource = newData;
+  }
+
+  private clearTable() {
+    this.dataSource = [];
+  }
+
+  public checkUserInput(e: any) {
+    if (this.dataSource.length > 0) {
+      if (this.userValueRef.nativeElement.value < (this.answer + 0.05) && this.userValueRef.nativeElement.value > (this.answer - 0.05)) {
+        this.visualisateCheckStatus(true);
+      } else {
+        this.visualisateCheckStatus(false);
+      }
+    }
+  }
+
+  private visualisateCheckStatus(bCorrect: boolean): void {
+    if (bCorrect) {
+      this.userValueRef.nativeElement.style.borderColor = 'rgb(100, 100, 100)';
+      this.checkStatusSpanRef.nativeElement.innerHTML = 'Correct';
+    } else {
+      this.userValueRef.nativeElement.style.borderColor = 'rgb(209, 0, 0)';
+      this.checkStatusSpanRef.nativeElement.innerHTML = 'Wrong';
     }
   }
 

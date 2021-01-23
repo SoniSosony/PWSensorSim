@@ -1,20 +1,20 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { EftComponent } from './eft.component';
+import { EquationsComponent } from './equations.component';
 
-describe('EftComponent', () => {
-  let component: EftComponent;
-  let fixture: ComponentFixture<EftComponent>;
+describe('EquationsComponent', () => {
+  let component: EquationsComponent;
+  let fixture: ComponentFixture<EquationsComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ EftComponent ]
+      declarations: [ EquationsComponent ]
     })
     .compileComponents();
   });
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(EftComponent);
+    fixture = TestBed.createComponent(EquationsComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

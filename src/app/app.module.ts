@@ -6,7 +6,6 @@ import { SimulationListComponent } from './components/simulation-list/simulation
 import { HeaderComponent } from './components/header/header.component';
 import { TheoryComponent } from './components/theory/theory.component';
 import { SimPanelComponent } from './components/sim-panel/sim-panel.component';
-import { EftComponent } from './components/eft/eft.component';
 import { TitrationComponent } from './components/titration/titration.component';
 
 import { AppComponent } from './app.component';
@@ -23,6 +22,9 @@ import { RouteService } from './services/route-service/route.service';
 import { DemoMaterialModule } from './material-module';
 import { TitrationChartComponent } from './components/titration-chart/titration-chart.component'
 
+import { MatTableModule } from '@angular/material/table';
+import { EquationsComponent } from './components/equations/equations.component';
+
 @NgModule({
   declarations: [
     AppComponent,
@@ -30,11 +32,11 @@ import { TitrationChartComponent } from './components/titration-chart/titration-
     HeaderComponent,
     TheoryComponent,
     SimPanelComponent,
-    EftComponent,
     TitrationComponent,
     EfphMainComponent,
     LineChartComponent,
     TitrationChartComponent,
+    EquationsComponent,
   ],
   imports: [
     BrowserModule,
@@ -42,7 +44,8 @@ import { TitrationChartComponent } from './components/titration-chart/titration-
     FormsModule,
     NgxChartsModule,
     BrowserAnimationsModule,
-    DemoMaterialModule
+    DemoMaterialModule,
+    MatTableModule
   ],
   entryComponents: [
   ],

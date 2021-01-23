@@ -1,20 +1,20 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { EfphBufferComponent } from './efph-buffer.component';
+import { EfphMainComponent } from './efph-main.component';
 
 describe('EfphBufferComponent', () => {
-  let component: EfphBufferComponent;
-  let fixture: ComponentFixture<EfphBufferComponent>;
+  let component: EfphMainComponent;
+  let fixture: ComponentFixture<EfphMainComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ EfphBufferComponent ]
+      declarations: [ EfphMainComponent ]
     })
     .compileComponents();
   });
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(EfphBufferComponent);
+    fixture = TestBed.createComponent(EfphMainComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

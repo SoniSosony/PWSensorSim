@@ -6,13 +6,7 @@ import { Temperature } from '../../classes/phMeter';
 import { ChartData } from '../../classes/ChartData';
 import { InteractionService } from '../../services/interaction.service';
 import { RouteService } from '../../services/route-service/route.service';
-
-export interface Tile {
-  color: string;
-  cols: number;
-  rows: number;
-  text: string;
-}
+import { PHMeasurement } from '../../classes/interfaces/basic';
 
 @Component({
   selector: 'app-efph-buffer',
@@ -21,17 +15,10 @@ export interface Tile {
 })
 export class EfphMainComponent implements OnInit, AfterViewInit {
 
-  tiles: Tile[] = [
-    {text: 'One', cols: 1, rows: 3, color: 'lightblue'},
-    {text: 'Two', cols: 3, rows: 2, color: 'lightgreen'},
-    {text: 'Three', cols: 3, rows: 1, color: 'lightpink'},
-  ];
-
   @HostListener('document:keydown.escape', ['$event'])
   handleKeyboardEscEvent(event: KeyboardEvent) { 
     this.pippetteDraggableElement.removeMouseMoveListeners();
     this.pippetteDraggableElement.placeInDefaultPosition();
-
     this.phMetrDraggableElement.removeMouseMoveListeners();
   }
 
@@ -39,6 +26,8 @@ export class EfphMainComponent implements OnInit, AfterViewInit {
   onResize(event: any) {
     this.setupSimToolDivAfterRender();
   }
+
+  @ViewChild('title') titleRef: ElementRef;
 
   @ViewChild('mainSimWindow') mainSimWindowRef: ElementRef;
   @ViewChild('mainDragWindow') mainDragWindowRef: ElementRef;
@@ -51,6 +40,26 @@ export class EfphMainComponent implements OnInit, AfterViewInit {
   @ViewChild('pipperreDiv') pippetteDivRef: ElementRef;
   @ViewChild('phMetrDiv') phMetrDivRef: ElementRef;
   @ViewChild('beakerForTest') beakerForTestRef: ElementRef;
+  @ViewChild('userValue') userValueRef: ElementRef;
+  @ViewChild('addValueToTableBtn') addValueToTableBtnRef: ElementRef;
+  @ViewChild('checkStatusSpan') checkStatusSpanRef: ElementRef;
+
+  @ViewChild('tableZero') tableZeroRef: ElementRef;
+  @ViewChild('tableTwentyFive') tableTwentyFiveRef: ElementRef;
+  @ViewChild('tableOnehundred') tableOnehundredRef: ElementRef;
+  @ViewChild('tablesNames') tablesNamesRef: ElementRef;
+
+  @ViewChild('eftText') eftTextRef: ElementRef;
+  @ViewChild('efphInstruction') efphInstructionRef: ElementRef;
+  @ViewChild('eftInstruction') eftInstructionRef: ElementRef;
+
+  @ViewChild('chooserZeroTemperature') chooserZeroTemperatureRef: ElementRef;
+  @ViewChild('chooserOnehundredTemperature') chooserOnehundredTemperatureRef: ElementRef;
+  @ViewChild('tableNameZeroTemperature') tableNameZeroTemperatureRef: ElementRef;
+  @ViewChild('tableNameOnehundredTemperature') tableNameOnehundredTemperatureRef: ElementRef;
+
+  @ViewChild('instruction') instructionRef: ElementRef;
+  @ViewChild('chart') chartRef: ElementRef;
 
   private pippetteDraggableElement: DraggableElement;
   private phMetrDraggableElement: DraggableElement;
@@ -61,9 +70,17 @@ export class EfphMainComponent implements OnInit, AfterViewInit {
   private phMetr = new phMeter();
   private beakersContent: any;
   private chartData = new ChartData();
+  private pageName: string;
+  showEquations: boolean = false;
+  showBeakersText: boolean = false;
 
-  phValue: string = '';
+  voltageValue: string = '';
+  temperatureEs: string = '59.16 mV';
 
+  displayedColumns: string[] = ["pH", "voltage"];
+  dataSourceFirst: PHMeasurement[] = [];
+  dataSourceSecond: PHMeasurement[] = [];
+  dataSourceThird: PHMeasurement[] = [];
 
   constructor(
       private shareService: InteractionService, 
@@ -73,9 +90,9 @@ export class EfphMainComponent implements OnInit, AfterViewInit {
 
     this.routeService.newPageName.subscribe((pageName: string) => {
       this.restartPage();
+      this.pageName = pageName;
       this.setSimulationMode(pageName);
       this.createBeakerLiquidContainers();
-      this.setBeakersText();
     });
   }
 
@@ -89,48 +106,79 @@ export class EfphMainComponent implements OnInit, AfterViewInit {
     this.createBeakerForTestLiquidContainer();
     this.createPippetteLiquidContainer();
 
-    let pageName: string= this.routeService.getPageName();
-    if(pageName == undefined) {
-      pageName = String(localStorage.getItem('pageName'));
+    this.pageName = this.routeService.getPageName();
+    if(this.pageName == undefined) {
+      this.pageName = String(localStorage.getItem('pageName'));
     }
 
-    this.setSimulationMode(pageName);
+    this.setSimulationMode(this.pageName);
     this.createBeakerLiquidContainers();
   }
 
   private setSimulationMode(pageName: string) {
     this.beakersContent = new Map();
+
+    this.setTitle(pageName);
+    this.setBeakersTextVisibility(pageName);
     
     if(pageName == 'efphBuffer') {
-      this.setEfphBufferMode();
+      this.setEfphBuffer(pageName);
     } else if(pageName == 'efphUsual') {
-      this.setEfphUsual();
+      this.setEfphUsual(pageName);
     } else if(pageName == 'eft') {
-      this.setEftMode();
+      this.setEftMode(pageName);
+    }
+
+    this.setTeablesView(pageName);
+  }
+
+  private setTitle(pageName: string): void {
+    if(pageName == 'efphBuffer') {
+      this.titleRef.nativeElement.innerHTML = "Determination of the Eout = f (pH) characteristics for test solutions";
+    } else if(pageName == 'efphUsual') {
+      this.titleRef.nativeElement.innerHTML = "Determination of the Eout = f (pH) characteristics for selected aqueous solutions";
+    } else if(pageName == 'eft') {
+      this.titleRef.nativeElement.innerHTML = "Determination of the Eout = f (T) characteristic";
     }
   }
 
-  private setEfphBufferMode() {
-    this.setBufferBeakersContent();
+  private setBeakersTextVisibility(pageName: string): void {
+    if(pageName == 'efphBuffer') {
+      this.showBeakersText = false;
+    } else if(pageName == 'efphUsual') {
+      this.showBeakersText = true;
+    } else if(pageName == 'eft') {
+      this.showBeakersText = false;
+    }
   }
 
-  private setEfphUsual() {
+  private setEfphBuffer(pageName: string) {
+    this.setBufferBeakersContent();
+    this.setTeablesView(pageName);
+    this.setInstructionView(pageName);
+  }
+
+  private setEfphUsual(pageName: string) {
     this.setUsualBeakerContent();
+    this.setTeablesView(pageName);
+    this.setInstructionView(pageName);
   }
 
-  private setEftMode() {
+  private setEftMode(pageName: string) {
     this.setBufferBeakersContent();
+    this.setTeablesView(pageName);
+    this.setInstructionView(pageName);
     this.temperatureChooserContainerRef.nativeElement.style.display = 'block';
   }
 
   private setBufferBeakersContent() {
-    this.beakersContent.set('beaker_1', { 'name': '2.21pH', 'pH': 2.21} );
-    this.beakersContent.set('beaker_2', { 'name': '3.29pH', 'pH': 3.29} );
-    this.beakersContent.set('beaker_3', { 'name': '4.56pH', 'pH': 4.56} );
-    this.beakersContent.set('beaker_4', { 'name': '5.72pH', 'pH': 5.72} );
-    this.beakersContent.set('beaker_5', { 'name': '7.96pH', 'pH': 7.96} );
-    this.beakersContent.set('beaker_6', { 'name': '9.15pH', 'pH': 9.15} );
-    this.beakersContent.set('beaker_7', { 'name': '10.38pH', 'pH': 10.38} );
+    this.beakersContent.set('beaker_1', { 'name': '1.7pH', 'pH': this.getRandomPH(1.7)} );
+    this.beakersContent.set('beaker_2', { 'name': '2.8pH', 'pH': this.getRandomPH(2.8)} );
+    this.beakersContent.set('beaker_3', { 'name': '4pH', 'pH': this.getRandomPH(4)} );
+    this.beakersContent.set('beaker_4', { 'name': '5.3pH', 'pH': this.getRandomPH(5.3)} );
+    this.beakersContent.set('beaker_5', { 'name': '7.5pH', 'pH': this.getRandomPH(7.5)} );
+    this.beakersContent.set('beaker_6', { 'name': '9.7pH', 'pH': this.getRandomPH(9.7)} );
+    this.beakersContent.set('beaker_7', { 'name': '12.1pH', 'pH': this.getRandomPH(12.1)} );
   }
 
   private setUsualBeakerContent() {
@@ -141,6 +189,33 @@ export class EfphMainComponent implements OnInit, AfterViewInit {
     this.beakersContent.set('beaker_5', { 'name': 'cola', 'pH': 2.5} );
     this.beakersContent.set('beaker_6', { 'name': 'sok', 'pH': 2.4} );
     this.beakersContent.set('beaker_7', { 'name': 'herbata', 'pH': 5.5} );
+  }
+
+  private getRandomPH(ph: number): number {
+    return Math.floor(Math.random() * 100) / 100 + ph;
+  }
+ 
+  private setTeablesView(pageName: string): void {
+    if(pageName == 'efphBuffer' || pageName == 'efphUsual') {
+      this.tableZeroRef.nativeElement.style.display = 'none';
+      this.tableOnehundredRef.nativeElement.style.display = 'none';
+      this.tablesNamesRef.nativeElement.style.display = 'none';
+    } else if(pageName == 'eft') {
+      this.tableZeroRef.nativeElement.style.display = 'block';
+      this.tableOnehundredRef.nativeElement.style.display = 'block';
+      this.tablesNamesRef.nativeElement.style.display = 'block';
+    }
+  }
+  private setInstructionView(pageName: string) {
+    if(pageName == 'efphBuffer' || pageName == 'efphUsual') {
+      this.eftTextRef.nativeElement.style.display = 'none';
+      this.efphInstructionRef.nativeElement.style.display = 'block';
+      this.eftInstructionRef.nativeElement.style.display = 'none';
+    } else if(pageName == 'eft') {
+      this.eftTextRef.nativeElement.style.display = 'block';
+      this.efphInstructionRef.nativeElement.style.display = 'none';
+      this.eftInstructionRef.nativeElement.style.display = 'block';
+    }
   }
 
   private setBeakersText() {
@@ -154,7 +229,7 @@ export class EfphMainComponent implements OnInit, AfterViewInit {
         if (beakerWithTestContainerElements[j].nodeName == 'IMG') {
           let beakerElement = beakerWithTestContainerElements[j];
           let content = this.beakersContent.get(beakerElement.id);
-          
+
           let textDiv = beakerWithTestContainerElements[j + 1];
           if (textDiv.firstChild.nodeName == '#text') {
             textDiv.innerHTML = content.name;
@@ -257,8 +332,7 @@ export class EfphMainComponent implements OnInit, AfterViewInit {
 
       if (this.isPhMetrInBeakerForTest()) {
         let voltage = this.phMetr.getVoltage(pH) * 1000;
-        this.phValue = voltage.toFixed(2)  + 'mV';
-        this.addChartData(pH, voltage);
+        this.voltageValue = voltage.toFixed(2)  + 'mV';
       }
     }
   }
@@ -276,8 +350,7 @@ export class EfphMainComponent implements OnInit, AfterViewInit {
       if (!this.beakerForTestLiquidСontainer.isEmpty()) {
         let pH = this.beakerForTestLiquidСontainer.getPh();
         let voltage = this.phMetr.getVoltage(pH) * 1000;
-        this.phValue = voltage.toFixed(2) + 'mV';
-        this.addChartData(pH, voltage);
+        this.voltageValue = voltage.toFixed(2) + 'mV';
       }
 
       let phMetr = this.phMetrDivRef.nativeElement.children[0];
@@ -286,12 +359,14 @@ export class EfphMainComponent implements OnInit, AfterViewInit {
       this.phMetrDraggableElement.placeInDefaultPosition();
   }
 
-  toEmptyBeakerForTest():void {
+  public toEmptyBeakerForTest():void {
     if (!this.beakerForTestLiquidСontainer.isEmpty()) {
       this.beakerForTestLiquidСontainer.toEmpty();
       let img = this.beakerForTestRef.nativeElement;
       img.src = '../../../assets/icons/beaker_empty.svg';
-      this.phValue = '';
+      this.voltageValue = '';
+      this.addValueToTableBtnRef.nativeElement.disabled = true;
+      this.checkStatusSpanRef.nativeElement.innerHTML = '';
     }
   }
 
@@ -332,7 +407,7 @@ export class EfphMainComponent implements OnInit, AfterViewInit {
       this.simToolDivRef.nativeElement.style.width = offsetWidth + 'px';
 
       let defaultPositionX = this.simToolDivRef.nativeElement.offsetLeft + offsetWidth / 3;
-      let defaultPositionY = this.simToolDivRef.nativeElement.offsetTop;
+      let defaultPositionY = 136; // this.simToolDivRef.nativeElement.offsetTop;
 
       this.pippetteDraggableElement.setDefaultPosition(defaultPositionX, defaultPositionY);
       this.pippetteDraggableElement.placeInDefaultPosition();
@@ -343,8 +418,7 @@ export class EfphMainComponent implements OnInit, AfterViewInit {
 
       let x = this.simToolDivRef.nativeElement.offsetLeft + offsetWidth;
       let y = this.simToolDivRef.nativeElement.offsetTop;
-      this.setInterfaceContainerPosition(x, y);
-      this.interfaceContainerRef.nativeElement.style.marginLeft = '1%';
+      this.setInterfaceContainerPosition(x, 136);
 
     } else {
       let outerThis = this;
@@ -363,7 +437,7 @@ export class EfphMainComponent implements OnInit, AfterViewInit {
     let simToolDivHeight = this.simToolDivRef.nativeElement.offsetHeight;
     let phMetrDivHeight = this.phMetrDivRef.nativeElement.offsetHeight;
     let offsetHeight = simToolDivHeight - phMetrDivHeight;
-    let defaultPositionY = this.mainDragWindowRef.nativeElement.offsetTop + offsetHeight;
+    let defaultPositionY = 136 + offsetHeight; // this.mainDragWindowRef.nativeElement.offsetTop + offsetHeight;
 
     return {
       defaultPositionX: defaultPositionX,
@@ -396,10 +470,14 @@ export class EfphMainComponent implements OnInit, AfterViewInit {
     this.toEmptyBeakerForTest();
     this.toEmptyPippette();
     this.placePhMetrInDefaultPosition();
+    this.clearTablesData();
+    this.hideChart();
     this.chartData.clearData();
     this.shareService.setEfphData([]);
-    this.phValue = '';
+    this.voltageValue = '';
     this.temperatureChooserContainerRef.nativeElement.style.display = 'none';
+    this.addValueToTableBtnRef.nativeElement.disabled = true;
+    this.userValueRef.nativeElement.value = "";
   }
 
   private placePhMetrInDefaultPosition(): void {
@@ -412,7 +490,20 @@ export class EfphMainComponent implements OnInit, AfterViewInit {
 
   temperatureChooseEvt(e: any): void {
     let temperature: string = e.target.value;
+    this.setTemperatureEs(temperature);
     this.setPhMetrTemperatureByStringValue(temperature);
+    this.toEmptyBeakerForTest();
+    this.addValueToTableBtnRef.nativeElement.disabled = true;
+  }
+
+  private setTemperatureEs(temperature: string) {
+    if (temperature == '0') {
+      this.temperatureEs = '54.2 mV';
+    } else if (temperature == '25') {
+      this.temperatureEs = '59.16 mV';
+    } else if (temperature == '100' ) {
+      this.temperatureEs = '74.04 mV';
+    }
   }
 
   private setPhMetrTemperatureByStringValue(temperature: string): void {
@@ -423,6 +514,139 @@ export class EfphMainComponent implements OnInit, AfterViewInit {
     } else if (temperature == '100' ) {
       this.phMetr.setTemperature(Temperature.ONEHUNDRED);
     }
+  }
+
+  public checkUserInput(e: any) {
+    if (this.pageName == 'efphBuffer' || this.pageName == 'efphUsual') {
+      this.checkUserPH();
+    } else if (this.pageName == 'eft') {
+      this.checkUserTemperature();
+    }
+
+  }
+
+  private checkUserPH() {
+    if (this.voltageValue != '') {
+      let userPH = this.userValueRef.nativeElement.value;
+      let pH = this.beakerForTestLiquidСontainer.getPh();
+      if ( userPH < (pH + 0.5) && userPH > (pH - 0.5) ) {
+        this.visualisateCheckStatus(true);
+      } else {
+        this.visualisateCheckStatus(false);
+      }
+    }
+  }
+
+  private checkUserTemperature() {
+    if (this.voltageValue != '') {
+      let userTemperature = this.userValueRef.nativeElement.value;
+      let temperature = this.phMetr.getTemperatureInCelsius();
+      if ( userTemperature < (temperature + 10) && userTemperature > (temperature -10) ) {
+        this.visualisateCheckStatus(true);
+      } else {
+        this.visualisateCheckStatus(false);
+      }
+
+      temperature = this.phMetr.getTemperature();
+      this.setTableTextByTemperature(temperature);
+      this.setRadioButtonTextByTemperature(temperature);
+    }
+  }
+
+  private visualisateCheckStatus(bCorrect: boolean): void {
+    if (bCorrect) {
+      this.userValueRef.nativeElement.style.borderColor = 'rgb(100, 100, 100)';
+      this.addValueToTableBtnRef.nativeElement.disabled = false;
+      this.checkStatusSpanRef.nativeElement.innerHTML = 'Correct';
+      this.checkStatusSpanRef.nativeElement.style.color = 'Green';
+    } else {
+      this.userValueRef.nativeElement.style.borderColor = 'rgb(209, 0, 0)';
+      this.addValueToTableBtnRef.nativeElement.disabled = true;
+      this.checkStatusSpanRef.nativeElement.innerHTML = 'Wrong';
+      this.checkStatusSpanRef.nativeElement.style.color = 'Red';
+    }
+  }
+
+  private setTableTextByTemperature(temperature: Temperature) {
+    if (temperature == Temperature.ZERO) {
+      this.tableNameZeroTemperatureRef.nativeElement.innerHTML = '0°C';
+    } else if (temperature == Temperature.ONEHUNDRED) {
+      this.tableNameOnehundredTemperatureRef.nativeElement.innerHTML = '100°C';
+    }
+  }
+
+  private setRadioButtonTextByTemperature(temperature: Temperature) {
+    if (temperature == Temperature.ZERO) {
+      this.chooserZeroTemperatureRef.nativeElement.innerHTML = '0°C';
+    } else if (temperature == Temperature.ONEHUNDRED) {
+      this.chooserOnehundredTemperatureRef.nativeElement.innerHTML = '100°C'
+    }
+  }
+
+  public addValueToTable() {
+
+    let pH = this.beakerForTestLiquidСontainer.getPh();
+    let voltage = parseInt( this.voltageValue.slice(0, -2) );
+
+    let newData: PHMeasurement = {
+      pH: pH, 
+      voltage: voltage
+    };
+
+    let temperature = this.phMetr.getTemperature();
+    this.addDataToTableByTemperature(temperature, newData);
+
+    this.addChartData(pH, voltage);
+
+    this.showChart();
+  }
+
+  private addDataToTableByTemperature(tableType: Temperature, newData: PHMeasurement): void {
+    if (tableType == Temperature.ZERO) {
+      this.dataSourceFirst = this.getNewDataToTableData(this.dataSourceFirst, newData);
+    } else if (tableType == Temperature.TWENTYFIVE) {
+      this.dataSourceSecond = this.getNewDataToTableData(this.dataSourceSecond, newData);
+    } else if (tableType == Temperature.ONEHUNDRED) {
+      this.dataSourceThird = this.getNewDataToTableData(this.dataSourceThird, newData);
+    }
+  }
+
+  private showChart() {
+    this.chartRef.nativeElement.style.display = 'block';
+    this.instructionRef.nativeElement.style.display = 'none';
+  }
+
+  private hideChart() {
+    this.chartRef.nativeElement.style.display = 'none';
+    this.instructionRef.nativeElement.style.display = 'block';
+  }
+
+  private clearTablesData(): void {
+    this.dataSourceFirst = [];
+    this.dataSourceSecond = [];
+    this.dataSourceThird = [];
+  }
+
+  private getNewDataToTableData(tableData: PHMeasurement[], newData: PHMeasurement): PHMeasurement[] {
+    let data: PHMeasurement[] = [];
+    for (let i = 0; i < tableData.length; i++) {
+      let value: PHMeasurement = tableData[i];
+      
+      if (value.pH != newData.pH) {
+        data.push(value);
+      } else {
+        alert('Value already exist in table');
+        return tableData;
+      }
+    }
+
+    data.push(newData);
+
+    return data;
+  }
+
+  public goToLink(url: string){
+    window.open(url, "_blank");
   }
 
 }

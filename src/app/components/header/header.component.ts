@@ -23,10 +23,10 @@ export class HeaderComponent implements OnInit {
 
   showNavBar() {
     if (!this.open) {
-      this.renderer.setStyle(this.simulationList.nativeElement, 'transform', `translate3d(-10px, 0, 0)`);
+      this.renderer.setStyle(this.simulationList.nativeElement, 'transform', `translate3d(-6px, 0, 0)`);
       this.open = true;
     } else {
-      this.renderer.setStyle(this.simulationList.nativeElement, 'transform', `translate3d(-290px, 0, 0)`);
+      this.renderer.setStyle(this.simulationList.nativeElement, 'transform', `translate3d(-300px, 0, 0)`);
       this.open = false;
     }
   }

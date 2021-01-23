@@ -1,49 +1,60 @@
-<h1>Wyznaczenie charakterystyki Eout=f(pH) dla roztworów buforowych</h1>
+<h1 style="margin-left: 10px;" #title>Determination of the Eout = f (pH) characteristics for test solutions</h1>
 <div id="mainSimWindow" #mainSimWindow>
     <div id="mainDragWindow" class="main-sim-window" #mainDragWindow>
         <div class="sim-window">
 
             <mat-grid-list cols="4" rowHeight="25%">
-                <mat-grid-tile rowspan='4' colspan='1' style="background: #ffffff;">
+
+                <mat-grid-tile rowspan='4' colspan='1' class="shadow" style="background: #ffffff;">
                     <div class="beakers-container" #beakersContainer>
                         <div class='beaker-with-text-container'>
                             <img id="beaker_1" src="../../../assets/icons/beaker_full.svg" (click)="beakerClicked($event)" class="beaker-empty">
-                            <div class="img-text">2.21pH</div>
+                            <div class="img-text" *ngIf="showBeakersText">krew</div>
                         </div>
                         <div class='beaker-with-text-container'>
                             <img id="beaker_2" src="../../../assets/icons/beaker_full.svg" (click)="beakerClicked($event)" class="beaker-empty">
-                            <div class="img-text">3.29pH</div>
+                            <div class="img-text" *ngIf="showBeakersText">mleko</div>
                         </div>
                         <div class='beaker-with-text-container'>
                             <img id="beaker_3" src="../../../assets/icons/beaker_full.svg" (click)="beakerClicked($event)" class="beaker-empty">
-                            <div class="img-text">4.56pH</div>
+                            <div class="img-text" *ngIf="showBeakersText">woda</div>
                         </div>
                         <div class='beaker-with-text-container'>
                             <img id="beaker_4" src="../../../assets/icons/beaker_full.svg" (click)="beakerClicked($event)" class="beaker-empty">
-                            <div class="img-text">5.72pH</div>
+                            <div class="img-text" *ngIf="showBeakersText">ocet</div>
                         </div>
                         <div class='beaker-with-text-container'>
                             <img id="beaker_5" src="../../../assets/icons/beaker_full.svg" (click)="beakerClicked($event)" class="beaker-empty">
-                            <div class="img-text">7.96pH</div>
+                            <div class="img-text" *ngIf="showBeakersText">cola</div>
                         </div>
                         <div class='beaker-with-text-container'>
                             <img id="beaker_6" src="../../../assets/icons/beaker_full.svg" (click)="beakerClicked($event)" class="beaker-empty">
-                            <div class="img-text">9.15pH</div>
+                            <div class="img-text" *ngIf="showBeakersText">sok</div>
                         </div>
                         <div class='beaker-with-text-container'>
                             <img id="beaker_7" src="../../../assets/icons/beaker_full.svg" (click)="beakerClicked($event)" class="beaker-empty">
-                            <div class="img-text">10.38pH</div>
+                            <div class="img-text" *ngIf="showBeakersText">herbata</div>
                         </div>
                     </div>
                 </mat-grid-tile>
 
-                <mat-grid-tile rowspan='2' colspan='3' style="background: #ffffff;">
-                    <div class="border chart-container">
+                <mat-grid-tile rowspan='2' colspan='3' class="shadow" style="background: #ffffff;">
+
+                    <div style="display: block" #instruction>
+                        <h4 style="margin-bottom: 0">How to use:</h4>
+                        <p style="margin-top: 2px;">1. Click on pHMeter.</p>
+                        <p>2. Click on beaker below.</p>
+                        <p>3. Click on pippette.</p>
+                        <p>4. Click on one of the beakers on the right.</p>
+                        <p>5. Click on beaker below</p>
+                    </div>
+
+                    <div class="border chart-container" #chart>
                         <app-line-chart class='chart'></app-line-chart>
                     </div>
                 </mat-grid-tile>
 
-                <mat-grid-tile rowspan='2' colspan='3' style="background: #ffffff;">
+                <mat-grid-tile rowspan='2' colspan='3' class="shadow" style="background: #ffffff;">
                     <div class="beaker-for-test-container" (click)="beakerForTestContainerClicked($event)" #beakerForTestContainer>
                         <img src="../../../assets/icons/phMetr.svg" class="phMetr-beaker-for-test">
                         <img src="../../../assets/icons/beaker_empty.svg" class="beaker-for-test" #beakerForTest>
@@ -53,19 +64,141 @@
 
               </mat-grid-list>
 
-        </div>     
-        <div class="sim-tools" #simToolDiv>
+        </div>  
+           
+        <div class="sim-tools shadow" #simToolDiv>
         </div>
-        <div id="interface_container" class="interface-container" #interfaceContainer>
-            <input value={{phValue}}>
-            <div #temperatureChooserContainer>
+
+        <div id="interface_container" class="interface-container shadow" #interfaceContainer>
+
+            <p style="display: none; margin-bottom: 2px;" #eftText>Select fluids temperature: </p>
+
+            <div style="display: none" #temperatureChooserContainer>
                 <input type="radio" id="male" name="temperature" value="0" (change)="temperatureChooseEvt($event)">
-                <label for="male">0°C</label><br>
-                <input type="radio" id="female" name="temperature" value="25" (change)="temperatureChooseEvt($event)">
+                <label for="male" #chooserZeroTemperature>???°C</label><br>
+                <input type="radio" id="female" name="temperature" value="25" (change)="temperatureChooseEvt($event)" checked>
                 <label for="female">25°C</label><br>
                 <input type="radio" id="other" name="temperature" value="100" (change)="temperatureChooseEvt($event)">
-                <label for="other">100°C</label> 
+                <label for="other" #chooserOnehundredTemperature>???°C</label> 
             </div>
+            <br>
+
+            <h4 style="margin-top: 0; margin-bottom: 4px">pH meter voltage:</h4>
+            <input value={{voltageValue}}>
+
+            <h4 style="margin-top: 10px; margin-bottom: 0">To do:</h4>
+            <div style="display: block;" #efphInstruction>
+                <p style="margin-top: 2px;">1. Calculate pH from a given voltage.</p>
+                <p>2. Enter the calculated value in the text box below.</p>
+                <p>3. Press "Check" button.</p>
+                <p>4. If the entered value is correct press "Add value to table" button.</p>
+            </div>
+
+            <div style="display: none;" #eftInstruction>
+                <p>1. Calculate temperature from a given voltage and pH.</p>
+                <p>2. Enter the calculated value (in °C) in the text box below.</p>
+                Due to the rounding error and low weight of the temperature value in the equation, the obtained value may differ from the actual ±15 ° C.
+                <p>3. Press "Check" button.</p>
+                <p>4. If the entered value is correct press "Add value to table" button.</p>
+            </div>
+
+            <div class='user-voltage-container'>
+                <input class="user-voltage-inpt" #userValue>
+                <button class="voltage-check-btn" (click)="checkUserInput($event)">Check</button>
+                <span style="margin-left: 6px;" #checkStatusSpan></span>
+            </div>
+
+            <div style="margin-top: 10px;">
+                <button (click)="this.showEquations = !this.showEquations">Show/hide equations</button>
+                <div class="equation-info" *ngIf="showEquations">
+                    <p>The transfer function of the pH electrode is:</p>
+                    <img src="../../../assets/icons/pHCalcFunc.svg">
+                    <p>where:</p>
+                    <p>• pH(X) = pH of unkown solution(X)</p>
+                    <p>• pH(S) = pH of standard solution = 7</p>
+                    <p style="margin-bottom: 2px;">• Es = Electric potential at reference or standard electrode</p>
+                    Es for currect temperature: <span>{{temperatureEs}}</span>
+                    <p>• Ex = Electric potential at pH-measuring electrode</p>
+                    <p>• F is the Faraday constant = 9.9485309*10^4 C/mol</p>
+                    <p>• R is the universal gas constant = 8.314510 J/(K*mol)</p>
+                    <p>• T is the temperature in Kelvin</p>
+                </div>
+            </div>
+
+            <div  class="tables">
+                <h4 style="margin-top: 0; margin-bottom: 6px">Tables:</h4>
+                <button (click)="addValueToTable()" disabled #addValueToTableBtn>Add value to table</button>
+                <br><br>
+
+                <div #tablesNames>
+                    <span #tableNameZeroTemperature>???°C</span>
+                    <span style="margin-left: 147px;">25°C</span>
+                    <span style="margin-left: 136px;" #tableNameOnehundredTemperature>???°C</span>
+                </div>
+
+                <div style="display: flex">
+
+                    <div class="table-container table-zero" #tableZero>
+                        <table mat-table [dataSource]="dataSourceFirst" class="mat-elevation-z8">
+
+                            <ng-container matColumnDef="pH">
+                            <th mat-header-cell *matHeaderCellDef> pH </th>
+                            <td mat-cell *matCellDef="let element"> {{element.pH}} </td>
+                            </ng-container>
+                        
+        
+                            <ng-container matColumnDef="voltage">
+                            <th mat-header-cell *matHeaderCellDef> Voltage </th>
+                            <td mat-cell *matCellDef="let element"> {{element.voltage}} </td>
+                            </ng-container>
+                        
+                            <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+                            <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+                        </table>
+                    </div>
+
+                    <div class="table-container table-twenty-five" #tableTwentyFive>
+                        <table mat-table [dataSource]="dataSourceSecond" class="mat-elevation-z8">
+
+                            <ng-container matColumnDef="pH">
+                            <th mat-header-cell *matHeaderCellDef> pH </th>
+                            <td mat-cell *matCellDef="let element"> {{element.pH}} </td>
+                            </ng-container>
+                        
+        
+                            <ng-container matColumnDef="voltage">
+                            <th mat-header-cell *matHeaderCellDef> Voltage </th>
+                            <td mat-cell *matCellDef="let element"> {{element.voltage}} </td>
+                            </ng-container>
+                        
+                            <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+                            <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+                        </table>
+                    </div>
+
+                    <div class="table-container table-onehundred" #tableOnehundred>
+                        <table mat-table [dataSource]="dataSourceThird" class="mat-elevation-z8">
+
+                            <ng-container matColumnDef="pH">
+                            <th mat-header-cell *matHeaderCellDef> pH </th>
+                            <td mat-cell *matCellDef="let element"> {{element.pH}} </td>
+                            </ng-container>
+                        
+        
+                            <ng-container matColumnDef="voltage">
+                            <th mat-header-cell *matHeaderCellDef> Voltage </th>
+                            <td mat-cell *matCellDef="let element"> {{element.voltage}} </td>
+                            </ng-container>
+                        
+                            <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+                            <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+                        </table>
+                    </div>
+
+                </div>
+                                  
+            </div>
+
         </div>
         <div id="pippette_div" (mousedown)="mouseDown($event)" class="tool-container" style="position: absolute;" #pipperreDiv>
             <img id="pippette" src="../../../assets/icons/pipette_empty.svg" class="tool draggable">

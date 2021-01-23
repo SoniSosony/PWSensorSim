@@ -31,16 +31,6 @@ export class SimulationListComponent implements OnInit {
     this.open = false;
   }
 
-  showNavBar() {
-    if (!this.open) {
-      this.renderer.setStyle(this.transformRef.nativeElement, 'transform', `translate3d(-10px, 0, 0)`);
-      this.open = true;
-    } else {
-      this.renderer.setStyle(this.transformRef.nativeElement, 'transform', `translate3d(-290px, 0, 0)`);
-      this.open = false;
-    }
-  }
-
   refClickedEvt(e: any) {
     let words = e.target.href.split('/');
     let urlEnd = words[words.length - 1];

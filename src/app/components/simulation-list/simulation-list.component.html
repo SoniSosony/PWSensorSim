@@ -1,19 +1,19 @@
-<nav #transform>
-    <ul>
-        <li><a routerLink="/theory" routerLinkActive="active" (click)="refClickedEvt($event)">Teoria</a></li>
-        <li><a class="a-clickable-without-href" (click)="toggleEfphSubMenu()">Wyznaczenie charakterystyki Eout=f(pH)</a></li>
+<nav class="shadow" #transform>
+    <ul class="main-list">
+        <li><a routerLink="/theory" routerLinkActive="active" (click)="refClickedEvt($event)">Theory</a></li>
+        <li><a class="a-clickable-without-href" (click)="toggleEfphSubMenu()">Determination of the Eout = f (pH) characteristic</a></li>
         <div class="sub-menu" #efphSubMenu>
             <ul>
-                <li><a routerLink="/efphBuffer" routerLinkActive="active" (click)="refClickedEvt($event)">Roztwory buforowe</a></li>
-                <li><a routerLink="/efphUsual" routerLinkActive="active" (click)="refClickedEvt($event)">Roztwory występujące w codziennych warunkach</a></li>
+                <li style="margin: 6px 0px 2px 0px;"><a routerLink="/efphBuffer" routerLinkActive="active" (click)="refClickedEvt($event)">Test solutions</a></li>
+                <li style="margin: 2px 0px 6px 0px;"><a routerLink="/efphUsual" routerLinkActive="active" (click)="refClickedEvt($event)">Solutions occurring in everyday conditions</a></li>
             </ul>
         </div>
-        <li><a routerLink="/eft" routerLinkActive="active" (click)="refClickedEvt($event)">Wyznaczenie charakterystyki Eout=f(T)</a></li>
-        <li><a class="a-clickable-without-href" (click)="toggleTitrationSubMenu()">Miareczkowanie</a></li>
+        <li><a routerLink="/eft" routerLinkActive="active" (click)="refClickedEvt($event)">Determination of the Eout = f (T) characteristic</a></li>
+        <li><a class="a-clickable-without-href" (click)="toggleTitrationSubMenu()">Titration</a></li>
         <div class="sub-menu" #titrationSubMenu>
             <ul>
-                <li><a routerLink="/titrationAcid" routerLinkActive="active" (click)="refClickedEvt($event)">Miareczkowanie kwasu – zasadą</a></li>
-                <li><a routerLink="/titrationAlkali" routerLinkActive="active" (click)="refClickedEvt($event)">miareczkowania zasady – kwasem</a></li>
+                <li style="margin: 6px 0px 2px 0px;"><a routerLink="/titrationAcid" routerLinkActive="active" (click)="refClickedEvt($event)">Acid - base titration</a></li>
+                <li style="margin: 2px 0px 6px 0px;"><a routerLink="/titrationAlkali" routerLinkActive="active" (click)="refClickedEvt($event)">Base - acid titration</a></li>
             </ul>
         </div>
     </ul>
